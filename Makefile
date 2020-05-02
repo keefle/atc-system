@@ -1,6 +1,6 @@
 build/atc: src/*.cpp src/*.hh
 	mkdir -p build
-	find src/  ! -name "*test.cpp" ! -name "*.hh" -name "*.cpp" | xargs g++ -g -Wall -lpthread -o build/atc
+	g++ -g -Wall -Werror -o build/atc src/waitlist.cpp src/plane.cpp src/tower.cpp src/sleep.cpp src/main.cpp src/threader.cpp -lpthread
 
 
 tower_test: src/tower_test.cpp
