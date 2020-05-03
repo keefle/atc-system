@@ -1,7 +1,7 @@
 #include "tower.hh"
 
 Tower::Tower() {
-    log_file.open ("tower.log");
+    log_file.open ("plens.log");
     log_file << "Plane ID\t"  << "Status\t" << "Request Time\t" << "Runway Time\t" << "Turnaround Time" << std::endl;
     log_file.flush();
 
@@ -30,6 +30,10 @@ int Tower::size_waiting(PlaneStatus status) {
 
 std::string Tower::list_waiting(PlaneStatus status) {
     return wl.list_waiting(status);
+}
+
+void Tower::shutdown() {
+    timeout = true;
 }
 
 
@@ -64,13 +68,37 @@ void Tower::request(Plane *plane) {
 
 void Tower::start() {
     pthread_mutex_lock(&checking_turn);
-    while(true) {
+    while(not timeout) {
         if (process_request()) {
             pthread_cond_wait(&left_runway, &checking_turn);
         } else {
             pthread_cond_wait(&newly_arrived, &checking_turn);
         }
     }
+
+    // Log remaining
+    while (wl.size_waiting(EMERGENCY)) {
+        Plane *current = wl.front(EMERGENCY);
+        log_file << current->log() << std::endl;
+        wl.pop(EMERGENCY);
+        delete current;
+    }
+
+    while (wl.size_waiting(ARRIVING)) {
+        Plane *current = wl.front(ARRIVING);
+        log_file << current->log() << std::endl;
+        wl.pop(ARRIVING);
+        delete current;
+    }
+
+    while (wl.size_waiting(DEPARTING)) {
+        Plane *current = wl.front(DEPARTING);
+        log_file << current->log() << std::endl;
+        wl.pop(DEPARTING);
+        delete current;
+    }
+
+    log_file.close();
 }
 
 bool Tower::process_request() {

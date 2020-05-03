@@ -25,6 +25,8 @@ class Plane {
         // Time for plane to takeoff or land in seconds
         int operation_time = 0;
 
+        bool completed = false;
+
     private:
         void genID();
 

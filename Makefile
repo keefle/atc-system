@@ -18,3 +18,4 @@ waitlist_test: src/waitlist_test.cpp
 clean:
 	rm -f tags
 	rm -rf build/*
+	rm -f *.log

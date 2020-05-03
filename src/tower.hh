@@ -23,11 +23,13 @@ class Tower {
 
         std::string next_plane_id = "none";
 
+        bool timeout = false;
+
         // The following memeber variables are used to remove starvation from the
         // system by limiting the number of consectutive uses of each queue
         int consecutive_arriving  = 0;
         int consecutive_departing = 0;
-        bool arriving_turn = false;
+        bool arriving_turn = true;
 
 
     private:
@@ -52,6 +54,8 @@ class Tower {
         int size_waiting();
         int size_waiting(PlaneStatus status);
         std::string list_waiting(PlaneStatus status);
+
+        void shutdown();
 
     private:
 };

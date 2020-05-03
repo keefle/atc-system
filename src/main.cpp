@@ -10,10 +10,12 @@
 #include "tower.hh"
 
 #define TICK 1
-int start_time = 0;
-int log_after = 0;
-float probability = 0.5;
-int simulation_time = 60;
+
+// Defaults of program falgs
+float probability     = 0.5;
+int   simulation_time = 60;
+int   start_time      = 0;
+int   log_after       = 0;
 
 // The following void functions are to be used when creating threads for planes
 // and the tower.
@@ -83,12 +85,14 @@ int main(int argc, char **argv) {
     start_time = int(std::time(0));
     srand(start_time);
 
+    std::cout << "== SIMULATION STARTED ==" << std::endl;
+
     // Launch tower on the background.
-    threader.run_thread(start_tower, &tower);
+    threader.run_tower(start_tower, &tower);
 
     // Add two planes. One departing and one arriving.
-    threader.run_thread(thread_depart_request, &tower);
-    threader.run_thread(thread_arrive_request, &tower);
+    threader.run_plane(thread_depart_request, &tower);
+    threader.run_plane(thread_arrive_request, &tower);
 
     bool timeout = false;
     int seconds_passed = 1;
@@ -102,20 +106,15 @@ int main(int argc, char **argv) {
         bool new_emergency_plane = seconds_passed % 40 * TICK == 0;
 
         if (new_emergency_plane) {
-            threader.run_thread(thread_emergency_request, &tower);
+            threader.run_plane(thread_emergency_request, &tower);
         }
 
         if(new_arriving_plane) {
-            threader.run_thread(thread_arrive_request, &tower);
+            threader.run_plane(thread_arrive_request, &tower);
         }
 
         if(new_departing_plane) {
-            threader.run_thread(thread_depart_request, &tower);
-        }
-
-        // If the simulation is over mark this as the last intorsion
-        if(seconds_passed == simulation_time) {
-            timeout = true;
+            threader.run_plane(thread_depart_request, &tower);
         }
 
         // Start reporting current queues' statuses after the "second" specified by the user.
@@ -124,13 +123,20 @@ int main(int argc, char **argv) {
             std::cout << "At sec " << seconds_passed << " air: " << tower.list_waiting(ARRIVING) << tower.list_waiting(EMERGENCY) << std::endl;
         }
 
+        // If the simulation is over mark this as the last iteration
+        if(seconds_passed == simulation_time) {
+            timeout = true;
+            tower.shutdown();
+            std::cout << "== SIMULATION FINISHED ==" << std::endl;
+            std::cout << "Releasing resources......" << std::endl;
+        }
         pthread_sleep(TICK);
         seconds_passed++;
     }
 
     // Destroy all remaining threads
     // (planes that are still waiting on the tower and the tower will be killed)
-    threader.cancel_all();
+    threader.join_tower();
 
     return 0;
 }

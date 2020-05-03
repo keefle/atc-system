@@ -67,6 +67,7 @@ void Plane::perform_action() {
     }
 
     runway_time_epoch = int(std::time(0));
+    completed = true;
     return;
 }
 
@@ -102,7 +103,11 @@ void Plane::genID() {
 
 std::string Plane::log() {
     std::ostringstream log;
-    log << getPrettyID() << "\t\t" << getPrettyStatus() << "\t" << request_time << "\t\t" << request_time + runway_time_epoch - request_time_epoch << "\t\t" << runway_time_epoch - request_time_epoch << std::flush;
+    if (completed) {
+        log << getPrettyID() << "\t\t" << getPrettyStatus() << "\t" << request_time << "\t\t" << request_time + runway_time_epoch - request_time_epoch << "\t\t" << runway_time_epoch - request_time_epoch << std::flush;
+    } else {
+        log << getPrettyID() << "\t\t" << getPrettyStatus() << "\t" << request_time << "\t\t" << "TBD" << "\t\t" << "TBD" << std::flush;
+    }
     return log.str();
 }
 

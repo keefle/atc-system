@@ -1,22 +1,22 @@
 #include "threader.hh"
 #include <signal.h>
-#include <pthread.h>
 
 
 Threader::Threader() {
 }
 
-void Threader::run_thread(void *(*start_routine) (void *), void *arg) {
+void Threader::run_plane(void *(*start_routine) (void *), void *arg) {
     pthread_t thread;
     pthread_create(&thread, NULL, start_routine, arg);
-    threads.push_back(thread);
+    planes.push_back(thread);
 }
 
-void Threader::cancel_all() {
-    for (pthread_t thread : threads) {
-        if(pthread_kill(thread, 0) == 0) {
-            pthread_cancel(thread);
-        }
-    }
+void Threader::run_tower(void *(*start_routine) (void *), void *arg) {
+    pthread_create(&tower, NULL, start_routine, arg);
+}
+
+
+void Threader::join_tower() {
+    pthread_join(tower, NULL);
 }
 

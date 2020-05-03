@@ -5,12 +5,14 @@
 
 class Threader {
     private:
-        std::vector<pthread_t> threads;
+        pthread_t tower;
+        std::vector<pthread_t> planes;
 
     public:
         Threader();
-        void run_thread(void *(*start_routine) (void *), void *arg);
-        void cancel_all();
+        void run_tower(void *(*start_routine) (void *), void *arg);
+        void run_plane(void *(*start_routine) (void *), void *arg);
+        void join_tower();
 };
 
 #endif
