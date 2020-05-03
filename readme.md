@@ -71,7 +71,8 @@ remaining requests and newly made ones and determine which plane is next.
     while(not timeout) {
 
         // process_request figures out which plane is next and returns true if it
-        // found one, false if it did not find any plane to schedule next.
+        // found one and will broadcast to all waiting planes, otherwise returns
+        // false if it did not find any plane to schedule next.
         if (process_request()) {
             // In case there was a plane found the tower will wait for it to
             // leave the runway and return the lock.
@@ -103,12 +104,15 @@ queue will get its turn eventually. We can use something similar to a Round
 Robbin in which we choose on turn by turn basis.
 
 Example:
+
+```
 0: D
 1: L
 2: D
 3: L
 4: D
 5: L
+```
 
 Here we switch between each queue type (DEPARTING/ARRIVING) and let them access
 the runway equally.
