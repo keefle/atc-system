@@ -1,7 +1,7 @@
 #include "tower.hh"
 
 Tower::Tower() {
-    log_file.open ("plens.log");
+    log_file.open ("planes.log");
     log_file << "Plane ID\t"  << "Status\t" << "Request Time\t" << "Runway Time\t" << "Turnaround Time" << std::endl;
     log_file.flush();
 
