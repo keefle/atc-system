@@ -38,7 +38,9 @@ void test_request_and_start() {
     assert(t.size_waiting(ARRIVING) == 0);
     assert(t.size_waiting(DEPARTING) == 0);
 
-    pthread_cancel(tower_thread);
+    t.shutdown();
+
+    pthread_join(tower_thread, NULL);
 }
 
 
